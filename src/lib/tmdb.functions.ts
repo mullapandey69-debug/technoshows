@@ -84,7 +84,7 @@ export const searchCatalog = createServerFn({ method: "GET" })
           overview: item.overview,
           poster_path: item.poster_path,
           backdrop_path: item.backdrop_path,
-          first_air_date: item.first_air_date,
+          ...(item.first_air_date ? { first_air_date: item.first_air_date } : {}),
           vote_average: item.vote_average,
         }];
       }
@@ -96,7 +96,7 @@ export const searchCatalog = createServerFn({ method: "GET" })
           overview: item.overview,
           poster_path: item.poster_path,
           backdrop_path: item.backdrop_path,
-          first_air_date: item.release_date,
+          ...(item.release_date ? { first_air_date: item.release_date } : {}),
           vote_average: item.vote_average,
         }];
       }
