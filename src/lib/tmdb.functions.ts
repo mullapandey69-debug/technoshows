@@ -23,6 +23,20 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
 }
 
 type List = { results: Show[] };
+type CatalogItem = {
+  id: number;
+  media_type: "movie" | "tv";
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  first_air_date?: string;
+  vote_average: number;
+};
+type MultiSearchItem =
+  | (Show & { media_type: "tv" })
+  | { id: number; media_type: "movie"; title: string; overview: string; poster_path: string | null; backdrop_path: string | null; release_date?: string; vote_average: number }
+  | { media_type: "person" };
 
 export const getHome = createServerFn({ method: "GET" }).handler(async () => {
   const [trending, popular, recent, recommended] = await Promise.all([
@@ -48,6 +62,47 @@ export const searchShows = createServerFn({ method: "GET" })
     const r = await tmdb<List>("/search/tv", { query: data.q, include_adult: "false" });
     if (!r.ok) return { ok: false as const, reason: r.reason };
     return { ok: true as const, results: r.data.results };
+  });
+
+// Search movies and TV shows together for the Browse/Search page.
+// Keep the existing TV-only search function above for compatibility with other callers.
+export const searchCatalog = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ q: z.string().trim().min(1).max(100) }).parse(d))
+  .handler(async ({ data }) => {
+    const r = await tmdb<{ results: MultiSearchItem[] }>("/search/multi", {
+      query: data.q,
+      include_adult: "false",
+      page: "1",
+    });
+    if (!r.ok) return { ok: false as const, reason: r.reason };
+    const results: CatalogItem[] = r.data.results.flatMap((item) => {
+      if (item.media_type === "tv") {
+        return [{
+          id: item.id,
+          media_type: "tv" as const,
+          name: item.name,
+          overview: item.overview,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          first_air_date: item.first_air_date,
+          vote_average: item.vote_average,
+        }];
+      }
+      if (item.media_type === "movie") {
+        return [{
+          id: item.id,
+          media_type: "movie" as const,
+          name: item.title,
+          overview: item.overview,
+          poster_path: item.poster_path,
+          backdrop_path: item.backdrop_path,
+          first_air_date: item.release_date,
+          vote_average: item.vote_average,
+        }];
+      }
+      return [];
+    });
+    return { ok: true as const, results };
   });
 
 export const getShow = createServerFn({ method: "GET" })
