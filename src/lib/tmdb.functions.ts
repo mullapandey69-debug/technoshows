@@ -113,6 +113,24 @@ export const getShow = createServerFn({ method: "GET" })
     return { ok: true as const, show: r.data };
   });
 
+export const getMovie = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ id: z.number().int().positive() }).parse(d))
+  .handler(async ({ data }) => {
+    const r = await tmdb<{
+      id: number;
+      title: string;
+      overview: string;
+      poster_path: string | null;
+      backdrop_path: string | null;
+      release_date?: string;
+      vote_average: number;
+      runtime?: number;
+      genres?: { id: number; name: string }[];
+    }>(`/movie/${data.id}`);
+    if (!r.ok) return { ok: false as const, reason: r.reason };
+    return { ok: true as const, movie: r.data };
+  });
+
 export const getSeason = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ id: z.number().int().positive(), season: z.number().int().min(0) }).parse(d))
   .handler(async ({ data }) => {
