@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search as SearchIcon, Loader2, Film, Tv } from "lucide-react";
+import { Search as SearchIcon, Loader2, Film } from "lucide-react";
 import { z } from "zod";
 import { searchCatalog, getHome } from "@/lib/tmdb.functions";
 import { ShowCard, DataNotice } from "@/components/ui-kit";
@@ -126,7 +126,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
     overview: item.overview,
     poster_path: item.poster_path,
     backdrop_path: item.backdrop_path,
-    first_air_date: item.first_air_date,
+    ...(item.first_air_date ? { first_air_date: item.first_air_date } : {}),
     vote_average: item.vote_average,
   };
 
