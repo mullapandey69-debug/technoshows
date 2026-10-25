@@ -135,7 +135,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
   if (item.media_type === "tv") return <ShowCard show={show} />;
 
   return (
-    <article className="group block w-full min-w-0">
+    <Link to="/movie/$id" params={{ id: String(item.id) }} className="group block w-full min-w-0">
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-muted shadow-card ring-1 ring-border transition duration-300 group-hover:ring-primary/60">
         {src ? <img src={src} alt={item.name} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
           : <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">{item.name}</div>}
@@ -149,8 +149,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
       <p className="mt-2 truncate text-sm font-medium" title={item.name}>{item.name}</p>
       <p className="text-xs text-muted-foreground">{year(item.first_air_date)} · Movie</p>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.overview || "No overview available."}</p>
-    </article>
-  );
+    </Link>
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
