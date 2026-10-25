@@ -150,6 +150,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
       <p className="text-xs text-muted-foreground">{year(item.first_air_date)} · Movie</p>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.overview || "No overview available."}</p>
     </Link>
+  );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
