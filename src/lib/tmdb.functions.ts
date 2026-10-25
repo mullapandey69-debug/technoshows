@@ -84,7 +84,7 @@ export const searchCatalog = createServerFn({ method: "GET" })
           overview: item.overview,
           poster_path: item.poster_path,
           backdrop_path: item.backdrop_path,
-          first_air_date: item.first_air_date,
+          ...(item.first_air_date ? { first_air_date: item.first_air_date } : {}),
           vote_average: item.vote_average,
         }];
       }
@@ -96,7 +96,7 @@ export const searchCatalog = createServerFn({ method: "GET" })
           overview: item.overview,
           poster_path: item.poster_path,
           backdrop_path: item.backdrop_path,
-          first_air_date: item.release_date,
+          ...(item.release_date ? { first_air_date: item.release_date } : {}),
           vote_average: item.vote_average,
         }];
       }
@@ -111,6 +111,24 @@ export const getShow = createServerFn({ method: "GET" })
     const r = await tmdb<ShowDetail>(`/tv/${data.id}`, { append_to_response: "recommendations" });
     if (!r.ok) return { ok: false as const, reason: r.reason };
     return { ok: true as const, show: r.data };
+  });
+
+export const getMovie = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ id: z.number().int().positive() }).parse(d))
+  .handler(async ({ data }) => {
+    const r = await tmdb<{
+      id: number;
+      title: string;
+      overview: string;
+      poster_path: string | null;
+      backdrop_path: string | null;
+      release_date?: string;
+      vote_average: number;
+      runtime?: number;
+      genres?: { id: number; name: string }[];
+    }>(`/movie/${data.id}`);
+    if (!r.ok) return { ok: false as const, reason: r.reason };
+    return { ok: true as const, movie: r.data };
   });
 
 export const getSeason = createServerFn({ method: "GET" })

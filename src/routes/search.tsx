@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Search as SearchIcon, Loader2, Film, Tv } from "lucide-react";
+import { Search as SearchIcon, Loader2, Film } from "lucide-react";
 import { z } from "zod";
 import { searchCatalog, getHome } from "@/lib/tmdb.functions";
 import { ShowCard, DataNotice } from "@/components/ui-kit";
@@ -126,7 +126,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
     overview: item.overview,
     poster_path: item.poster_path,
     backdrop_path: item.backdrop_path,
-    first_air_date: item.first_air_date,
+    ...(item.first_air_date ? { first_air_date: item.first_air_date } : {}),
     vote_average: item.vote_average,
   };
 
@@ -135,7 +135,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
   if (item.media_type === "tv") return <ShowCard show={show} />;
 
   return (
-    <article className="group block w-full min-w-0">
+    <Link to="/movie/$id" params={{ id: String(item.id) }} className="group block w-full min-w-0">
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-muted shadow-card ring-1 ring-border transition duration-300 group-hover:ring-primary/60">
         {src ? <img src={src} alt={item.name} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
           : <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">{item.name}</div>}
@@ -149,7 +149,7 @@ function CatalogCard({ item }: { item: CatalogResult }) {
       <p className="mt-2 truncate text-sm font-medium" title={item.name}>{item.name}</p>
       <p className="text-xs text-muted-foreground">{year(item.first_air_date)} · Movie</p>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.overview || "No overview available."}</p>
-    </article>
+    </Link>
   );
 }
 
