@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      homepage_popup: {
+        Row: {
+          id: number
+          enabled: boolean
+          title: string
+          message: string
+          image_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          enabled?: boolean
+          title?: string
+          message?: string
+          image_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          enabled?: boolean
+          title?: string
+          message?: string
+          image_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       watch_progress: {
         Row: {
           backdrop_path: string | null
