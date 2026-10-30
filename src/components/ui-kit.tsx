@@ -29,7 +29,7 @@ export function Header() {
     const f = () => setScrolled(window.scrollY > 20);
     f(); window.addEventListener("scroll", f); return () => window.removeEventListener("scroll", f);
   }, []);
-  const nav = [{ to: "/", label: "Home" }, { to: "/search", label: "Browse" }, { to: "/my-list", label: "My List" }, { to: "/setup", label: "Setup" }] as const;
+  const nav = [{ to: "/", label: "Home" }, { to: "/search", label: "Browse" }, { to: "/my-list", label: "My List" }] as const;
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition ${scrolled || open ? "bg-background/90 backdrop-blur-lg border-b" : "bg-gradient-to-b from-background/80 to-transparent"}`}>
       <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-6 px-4 md:px-10">
