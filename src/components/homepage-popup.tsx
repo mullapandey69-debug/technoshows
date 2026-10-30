@@ -9,13 +9,11 @@ type PopupContent = {
   image_url: string | null;
 };
 
-const SESSION_KEY = "technoshows-homepage-popup-dismissed";
 
 export function HomepagePopup() {
   const [popup, setPopup] = useState<PopupContent | null>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "1") return;
     let active = true;
     void (async () => {
       const { data, error } = await supabase
@@ -25,7 +23,6 @@ export function HomepagePopup() {
         .maybeSingle();
       if (!active || error || !data?.enabled) return;
       if (!data.title?.trim() && !data.message?.trim() && !data.image_url) return;
-      sessionStorage.setItem(SESSION_KEY, "1");
       setPopup(data);
     })();
     return () => { active = false; };
