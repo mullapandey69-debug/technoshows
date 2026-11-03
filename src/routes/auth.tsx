@@ -27,6 +27,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showTechnoLogin, setShowTechnoLogin] = useState(false);
   useEffect(() => { if (user) navigate({ to: "/" }); }, [user, navigate]);
 
   const submit = async (e: React.FormEvent) => {
@@ -51,12 +52,16 @@ function AuthPage() {
         <p className="mt-1 text-sm text-muted-foreground">Save your watchlist and pick up where you left off.</p>
         <button onClick={() => oauth("google")} className={`${btn.ghost} mt-6 w-full`}>Continue with Google</button>
         <button onClick={() => oauth("lovable")} className={`${btn.ghost} mt-2 w-full`}>Continue with Lovable</button>
-        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px flex-1 bg-border" />or<div className="h-px flex-1 bg-border" /></div>
+        <button type="button" onClick={() => { setShowTechnoLogin(true); setMsg(null); }} className={`${btn.primary} mt-2 w-full`}>Continue with Techno Login</button>
+        {showTechnoLogin && <>
+        <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px flex-1 bg-border" />Techno Login<div className="h-px flex-1 bg-border" /></div>
         <form onSubmit={submit} className="space-y-3">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" className="h-11 w-full rounded-lg border bg-input/30 px-3 outline-none focus:border-primary" />
           <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" aria-label="Password" className="h-11 w-full rounded-lg border bg-input/30 px-3 outline-none focus:border-primary" />
           <button disabled={busy} className={`${btn.primary} w-full`}>{busy ? "Please wait…" : mode === "in" ? "Sign in" : "Sign up"}</button>
         </form>
+        <button type="button" onClick={() => { setShowTechnoLogin(false); setMsg(null); }} className="mt-3 text-sm text-muted-foreground hover:text-foreground">Back to sign-in options</button>
+        </>}
         {msg && <p className={`mt-3 text-sm ${msg.ok ? "text-gold" : "text-destructive"}`}>{msg.text}</p>}
         <button onClick={() => setMode(mode === "in" ? "up" : "in")} className="mt-5 text-sm text-muted-foreground hover:text-foreground">
           {mode === "in" ? "New here? Create an account" : "Already have an account? Sign in"}
