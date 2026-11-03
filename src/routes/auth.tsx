@@ -39,8 +39,8 @@ function AuthPage() {
     if (error) return setMsg({ ok: false, text: error.message });
     if (mode === "up" && !data.session) setMsg({ ok: true, text: "Check your email to confirm your account." });
   };
-  const oauth = async (p: "google" | "lovable") => {
-    const r = await lovable.auth.signInWithOAuth(p, { redirect_uri: window.location.origin });
+  const oauth = async () => {
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (r.error) setMsg({ ok: false, text: "Sign-in failed. Please try again." });
   };
 
@@ -50,8 +50,7 @@ function AuthPage() {
         <Logo />
         <h1 className="mt-6 text-2xl font-bold">{mode === "in" ? "Welcome back" : "Create your account"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">Save your watchlist and pick up where you left off.</p>
-        <button onClick={() => oauth("google")} className={`${btn.ghost} mt-6 w-full`}>Continue with Google</button>
-        <button onClick={() => oauth("lovable")} className={`${btn.ghost} mt-2 w-full`}>Continue with Lovable</button>
+        <button onClick={() => oauth()} className={`${btn.ghost} mt-6 w-full`}>Continue with Google</button>
         <button type="button" onClick={() => { setShowTechnoLogin(true); setMsg(null); }} className={`${btn.primary} mt-2 w-full`}>Continue with Techno Login</button>
         {showTechnoLogin && <>
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px flex-1 bg-border" />Techno Login<div className="h-px flex-1 bg-border" /></div>
