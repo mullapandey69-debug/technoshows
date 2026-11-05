@@ -6,6 +6,7 @@ import { img, year } from "@/lib/tmdb-types";
 import { Row, RowSkeleton, Rating, DataNotice, btn } from "@/components/ui-kit";
 import { useProgress } from "@/lib/library";
 import { useAuth } from "@/hooks/use-auth";
+import { HomepagePopup } from "@/components/homepage-popup";
 
 const homeQuery = queryOptions({ queryKey: ["home"], queryFn: () => getHome(), staleTime: 10 * 60_000 });
 
@@ -59,6 +60,7 @@ function Home() {
   const hero = data.trending.find((s) => s.backdrop_path) ?? data.trending[0];
   return (
     <>
+      <HomepagePopup />
       {hero && (
         <section className="relative h-[78vh] min-h-[520px] w-full overflow-hidden">
           <img src={img(hero.backdrop_path, "original") ?? ""} alt="" className="absolute inset-0 h-full w-full object-cover" />
