@@ -33,7 +33,7 @@ export const providers: EmbedProvider[] = [
       }
 
       const url = new URL(
-        "https://nxsha.screenscape.me/embed"
+        "https://web.screenscape.fun/embed"
       );
 
       const params = new URLSearchParams({
