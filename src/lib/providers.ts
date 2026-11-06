@@ -33,7 +33,7 @@ export const providers: EmbedProvider[] = [
       }
 
       const url = new URL(
-        "https://nxsha.screenscape.me/embed"
+        "https://web.screenscape.fun/embed"
       );
 
       const params = new URLSearchParams({
@@ -70,7 +70,7 @@ export function isSafeEmbedUrl(url: string) {
 
     return (
       parsed.protocol === "https:" &&
-      parsed.hostname === "nxsha.screenscape.me"
+      parsed.hostname === "web.screenscape.fun"
     );
   } catch {
     return false;
