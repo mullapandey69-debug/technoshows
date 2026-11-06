@@ -70,7 +70,7 @@ export function isSafeEmbedUrl(url: string) {
 
     return (
       parsed.protocol === "https:" &&
-      parsed.hostname === "nxsha.screenscape.me"
+      parsed.hostname === "web.screenscape.fun"
     );
   } catch {
     return false;
