@@ -94,3 +94,84 @@
 }
 
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+
+/* TechnoShows Liquid Glass surfaces */
+:root {
+  --glass-fill: oklch(1 0 0 / 7%);
+  --glass-fill-strong: oklch(1 0 0 / 11%);
+  --glass-edge: oklch(1 0 0 / 16%);
+  --glass-highlight: oklch(1 0 0 / 22%);
+  --glass-shadow: 0 18px 55px oklch(0 0 0 / 34%), inset 0 1px 0 var(--glass-highlight);
+}
+
+body {
+  background-image:
+    radial-gradient(900px 520px at 5% 0%, oklch(0.34 0.12 25 / 17%), transparent 65%),
+    radial-gradient(850px 600px at 95% 22%, oklch(0.3 0.08 275 / 13%), transparent 68%),
+    var(--gradient-page);
+  background-attachment: fixed;
+}
+
+/* Shared translucent surfaces used throughout browse, auth, lists and detail pages. */
+.bg-card,
+.bg-popover,
+.bg-secondary,
+.bg-secondary\/80,
+.bg-secondary\/60 {
+  background-color: var(--glass-fill);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  backdrop-filter: blur(22px) saturate(155%);
+}
+
+.bg-card,
+.bg-popover {
+  border-color: var(--glass-edge);
+  box-shadow: var(--glass-shadow);
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: oklch(1 0 0 / 6%);
+  border-color: var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: oklch(1 0 0 / 10%);
+  border-color: oklch(0.72 0.18 25 / 70%);
+  box-shadow: 0 0 0 3px oklch(0.6 0.23 25 / 14%);
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bg-card,
+.rounded-xl.border,
+.rounded-2xl.border {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .group\/row a > div:first-child {
+    transition: transform 320ms cubic-bezier(.2,.8,.2,1), box-shadow 320ms ease;
+  }
+  .group\/row a:hover > div:first-child {
+    box-shadow: 0 18px 42px oklch(0 0 0 / 45%), 0 0 0 1px oklch(1 0 0 / 20%);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px))) {
+  .bg-card, .bg-popover, .bg-secondary, .bg-secondary\/80, .bg-secondary\/60 {
+    background-color: oklch(0.19 0.006 285 / 96%);
+  }
+}
+
+@media (max-width: 640px) {
+  body { background-attachment: scroll; }
+}
