@@ -87,7 +87,8 @@ function Home() {
         </section>
       )}
       <div className="relative z-10 -mt-8 space-y-10">
-        <ContinueWatching />\n        <BrowseByPlatform />
+        <ContinueWatching />
+        <BrowseByPlatform />
         <Row title="Trending" shows={data.trending} />
         <Row title="Popular Shows" shows={data.popular} />
         <Row title="Recently Added" shows={data.recent} />
