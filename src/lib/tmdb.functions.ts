@@ -138,3 +138,51 @@ export const getSeason = createServerFn({ method: "GET" })
     if (!r.ok) return { ok: false as const, reason: r.reason };
     return { ok: true as const, season: r.data };
   });
+
+
+export interface StreamingProvider { provider_id: number; provider_name: string; logo_path: string; }
+
+export const getStreamingProviders = createServerFn({ method: "GET" }).handler(async () => {
+  const r = await tmdb<{ results: StreamingProvider[] }>("/watch/providers/tv", { watch_region: "IN", language: "en-US" });
+  if (!r.ok) return { ok: false as const, reason: r.reason };
+  const wanted = [/netflix/i, /amazon prime video/i, /disney.?hotstar|hotstar/i, /zee5/i, /sony.?liv/i, /apple tv/i, /jio.?cinema/i, /lionsgate play/i, /hungama play/i];
+  const results = wanted.flatMap((pattern) => { const provider = r.data.results.find((item) => pattern.test(item.provider_name)); return provider ? [provider] : []; });
+  return { ok: true as const, results };
+});
+
+export const getShowsByProvider = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ providerId: z.number().int().positive() }).parse(d))
+  .handler(async ({ data }) => {
+    const r = await tmdb<List>("/discover/tv", { watch_region: "IN", with_watch_providers: String(data.providerId), with_watch_monetization_types: "flatrate|free|ads", sort_by: "popularity.desc", page: "1" });
+    if (!r.ok) return { ok: false as const, reason: r.reason };
+
+    const results = r.data.results.filter((show) => show.poster_path);
+    // TMDB provider discovery can omit major reality titles. Keep Hindi Bigg Boss
+    // visible on JioHotstar when it is missing from the provider-filtered results.
+    const providers = await tmdb<{ results: StreamingProvider[] }>("/watch/providers/tv", {
+      watch_region: "IN",
+      language: "en-US",
+    });
+    const selectedProvider = providers.ok
+      ? providers.data.results.find((provider) => provider.provider_id === data.providerId)
+      : undefined;
+
+    if (selectedProvider && /jio.?hotstar|disney.?hotstar|hotstar/i.test(selectedProvider.provider_name)) {
+      const biggBoss = await tmdb<{ results: (Show & { original_language?: string })[] }>("/search/tv", {
+        query: "Bigg Boss",
+        include_adult: "false",
+        language: "en-IN",
+        page: "1",
+      });
+      if (biggBoss.ok) {
+        const hindiBiggBoss = biggBoss.data.results.find(
+          (show) => show.name.trim().toLowerCase() === "bigg boss" && show.original_language === "hi" && show.poster_path,
+        );
+        if (hindiBiggBoss && !results.some((show) => show.id === hindiBiggBoss.id)) {
+          results.unshift(hindiBiggBoss);
+        }
+      }
+    }
+
+    return { ok: true as const, results };
+  });

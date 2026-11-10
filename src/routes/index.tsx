@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Play, Info } from "lucide-react";
-import { getHome } from "@/lib/tmdb.functions";
+import { getHome, getStreamingProviders } from "@/lib/tmdb.functions";
 import { img, year } from "@/lib/tmdb-types";
 import { Row, RowSkeleton, Rating, DataNotice, btn } from "@/components/ui-kit";
 import { useProgress } from "@/lib/library";
@@ -54,6 +54,13 @@ function ContinueWatching() {
   );
 }
 
+function BrowseByPlatform() {
+  const { data, isLoading } = useQuery({ queryKey: ["streaming-providers", "IN"], queryFn: () => getStreamingProviders(), staleTime: 60 * 60_000 });
+  if (isLoading) return <section className="px-4 md:px-10"><h2 className="mb-4 text-lg font-semibold md:text-xl">Browse by platform</h2><div className="flex gap-3 overflow-hidden">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-[84px] w-[84px] shrink-0 rounded-2xl" />)}</div></section>;
+  if (!data?.ok || !data.results.length) return null;
+  return <section className="px-4 md:px-10"><h2 className="mb-4 text-lg font-semibold md:text-xl">Browse by platform</h2><div className="scrollbar-none flex gap-3 overflow-x-auto pb-2">{data.results.map((provider) => <Link key={provider.provider_id} to="/platforms/$providerId" params={{ providerId: String(provider.provider_id) }} search={{ name: provider.provider_name }} aria-label={"Browse shows on " + provider.provider_name} title={provider.provider_name} className="group flex h-[84px] w-[84px] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/[0.06] p-2 shadow-[0_10px_30px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:-translate-y-1 hover:border-primary/60 hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><img src={"https://image.tmdb.org/t/p/w185" + provider.logo_path} alt={provider.provider_name} loading="lazy" className="max-h-full max-w-full rounded-xl object-contain" /></Link>)}</div></section>;
+}
+
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
   if (!data.ok) return <div className="px-4 pt-32"><DataNotice reason={data.reason} /></div>;
@@ -81,6 +88,7 @@ function Home() {
       )}
       <div className="relative z-10 -mt-8 space-y-10">
         <ContinueWatching />
+        <BrowseByPlatform />
         <Row title="Trending" shows={data.trending} />
         <Row title="Popular Shows" shows={data.popular} />
         <Row title="Recently Added" shows={data.recent} />
