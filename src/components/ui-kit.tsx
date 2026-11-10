@@ -31,8 +31,8 @@ export function Header() {
   }, []);
   const nav = [{ to: "/", label: "Home" }, { to: "/search", label: "Browse" }, { to: "/my-list", label: "My List" }] as const;
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition ${scrolled || open ? "bg-background/90 backdrop-blur-lg border-b" : "bg-gradient-to-b from-background/80 to-transparent"}`}>
-      <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-6 px-4 md:px-10">
+    <header className={`fixed inset-x-0 top-0 z-50 px-3 pt-3 transition-all duration-300 ${scrolled || open ? "bg-transparent" : "bg-transparent"}`}>
+      <div className="mx-auto flex h-16 max-w-[1460px] items-center gap-6 rounded-full border border-white/15 bg-white/[0.07] px-4 shadow-[0_14px_45px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl md:px-8">
         <Logo />
         <nav className="hidden gap-6 text-sm md:flex">
           {nav.map((n) => (
@@ -50,7 +50,7 @@ export function Header() {
         </div>
       </div>
       {open && (
-        <nav className="flex flex-col gap-1 px-4 pb-4 md:hidden">
+        <nav className="mx-auto mt-2 flex max-w-[1460px] flex-col gap-1 rounded-3xl border border-white/15 bg-black/55 p-3 shadow-2xl backdrop-blur-2xl md:hidden">
           {nav.map((n) => <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 hover:bg-secondary">{n.label}</Link>)}
           {user ? <button className="rounded-lg px-3 py-3 text-left hover:bg-secondary" onClick={() => supabase.auth.signOut()}>Sign out</button>
             : <Link to="/auth" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-primary hover:bg-secondary">Sign in</Link>}
@@ -71,7 +71,7 @@ export function ShowCard({ show }: { show: Pick<Show, "id" | "name" | "poster_pa
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-muted shadow-card ring-1 ring-border transition duration-300 group-hover:ring-primary/60 group-focus-visible:ring-primary md:group-hover:-translate-y-1">
         {src ? <img src={src} alt={show.name} loading="lazy" className="h-full w-full object-cover transition duration-500 md:group-hover:scale-105" />
           : <div className="flex h-full items-center justify-center p-3 text-center text-xs text-muted-foreground">{show.name}</div>}
-        {show.vote_average != null && <div className="absolute left-2 top-2 rounded-md bg-background/80 px-1.5 py-0.5 text-[11px] backdrop-blur"><Rating value={show.vote_average} /></div>}
+        {show.vote_average != null && <div className="absolute left-2 top-2 rounded-md bg-black/35 px-1.5 py-0.5 text-[11px] backdrop-blur-xl ring-1 ring-white/15"><Rating value={show.vote_average} /></div>}
       </div>
       <p className="mt-2 truncate text-sm font-medium">{show.name}</p>
       {show.first_air_date !== undefined && <p className="text-xs text-muted-foreground">{year(show.first_air_date)}</p>}
