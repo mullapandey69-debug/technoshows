@@ -7,7 +7,7 @@ import { getSeason } from "@/lib/tmdb.functions";
 import { img, year, type Episode } from "@/lib/tmdb-types";
 import { DataNotice, Rating, btn } from "@/components/ui-kit";
 import { LibraryButtons } from "@/components/LibraryButtons";
-import { activeProvider, isSafeEmbedUrl } from "@/lib/providers";
+import { providers, isSafeEmbedUrl } from "@/lib/providers";
 import { recallEpisode, rememberEpisode, saveProgress } from "@/lib/library";
 import { useAuth } from "@/hooks/use-auth";
 import { showQuery } from "./show.$id";
@@ -161,7 +161,9 @@ function Player({ id, season, episode, still, available, loading }: { id: number
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const url = activeProvider?.buildEmbedUrl(id, season, episode) ?? null;
+  const [providerId, setProviderId] = useState("vidrift");
+  const selectedProvider = providers.find((provider) => provider.id === providerId) ?? providers[0] ?? null;
+  const url = selectedProvider?.buildEmbedUrl(id, season, episode) ?? null;
   const valid = url ? isSafeEmbedUrl(url) : false;
 
   // A cross-origin iframe cannot tell the parent page whether its video is playing.
@@ -172,6 +174,12 @@ function Player({ id, season, episode, still, available, loading }: { id: number
     return () => clearTimeout(t);
   }, [url, available, valid, loaded, failed, attempt]);
 
+  const changeProvider = (nextProviderId: string) => {
+    setProviderId(nextProviderId);
+    setFailed(false);
+    setLoaded(false);
+    setAttempt((value) => value + 1);
+  };
   const retry = () => {
     setFailed(false);
     setLoaded(false);
@@ -181,7 +189,7 @@ function Player({ id, season, episode, still, available, loading }: { id: number
 
   let overlay: React.ReactNode = null;
   if (loading) overlay = <div className="skeleton absolute inset-0" />;
-  else if (!activeProvider) overlay = (
+  else if (!selectedProvider) overlay = (
     <Notice icon={<PlugZap className="h-8 w-8 text-primary" />} title="No video provider connected"
       body="Episode details are live, but playback needs an authorized embedding provider. Once one is connected, episodes will play right here." link />
   );
@@ -205,6 +213,14 @@ function Player({ id, season, episode, still, available, loading }: { id: number
 
   return (
     <div id="player" ref={ref} className="group relative mt-8 aspect-video w-full overflow-hidden rounded-2xl bg-player shadow-card ring-1 ring-border">
+      <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
+        {providers.map((provider) => (
+          <button key={provider.id} type="button" onClick={() => changeProvider(provider.id)} aria-pressed={provider.id === providerId}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur transition ${provider.id === providerId ? "bg-primary text-primary-foreground" : "bg-background/80 text-foreground hover:bg-background"}`}>
+            {provider.name}
+          </button>
+        ))}
+      </div>
       {still && !url && <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
       {url && valid && available && !failed && (
         <iframe key={attempt} src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
