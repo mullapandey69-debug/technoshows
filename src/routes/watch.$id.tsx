@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Maximize, Play, PlugZap, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize, Play, PlugZap, Clock, LoaderCircle } from "lucide-react";
 import { getSeason } from "@/lib/tmdb.functions";
 import { img, year, type Episode } from "@/lib/tmdb-types";
 import { DataNotice, Rating, btn } from "@/components/ui-kit";
@@ -160,15 +160,23 @@ function Player({ id, season, episode, still, available, loading }: { id: number
   const ref = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const url = activeProvider?.buildEmbedUrl(id, season, episode) ?? null;
   const valid = url ? isSafeEmbedUrl(url) : false;
 
+  // A cross-origin iframe cannot tell the parent page whether its video is playing.
+  // Treat onLoad as "embed document loaded", not proof of playback, and allow a retry.
   useEffect(() => {
-    if (!url) return;
-    const t = setTimeout(() => { if (!loaded) setFailed(true); }, 15000);
+    if (!url || !available || !valid || loaded || failed) return;
+    const t = setTimeout(() => setFailed(true), 25000);
     return () => clearTimeout(t);
-  }, [url, loaded]);
+  }, [url, available, valid, loaded, failed, attempt]);
 
+  const retry = () => {
+    setFailed(false);
+    setLoaded(false);
+    setAttempt((value) => value + 1);
+  };
   const fullscreen = () => ref.current?.requestFullscreen?.().catch(() => {});
 
   let overlay: React.ReactNode = null;
@@ -179,13 +187,29 @@ function Player({ id, season, episode, still, available, loading }: { id: number
   );
   else if (!available) overlay = <Notice title="Episode unavailable" body="This episode hasn't aired yet or isn't listed for this season." />;
   else if (!valid) overlay = <Notice title="Invalid player link" body="The provider returned an unusable link for this episode." />;
-  else if (failed) overlay = <Notice title="The player didn't load" body="The provider may be blocking embeds or is temporarily down. Try again later." />;
+  else if (failed) overlay = (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-player/90 p-6 text-center">
+      <h3 className="text-lg font-semibold md:text-xl">The player couldn't finish loading</h3>
+      <p className="mt-2 max-w-md text-sm text-muted-foreground">The provider may be slow or blocking this embed. You can retry, or open the episode directly on the provider.</p>
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
+        <button className={btn.primary} onClick={retry}>Retry player</button>
+        {url && <a className={btn.ghost} href={url} target="_blank" rel="noreferrer">Open provider directly</a>}
+      </div>
+    </div>
+  );
+  else if (!loaded) overlay = (
+    <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center bg-player/90 p-6 text-center">
+      <LoaderCircle className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
+      <h3 className="mt-4 text-lg font-semibold md:text-xl">Connecting to video provider…</h3>
+      <p className="mt-2 max-w-md text-sm text-muted-foreground">This can take a little longer while the provider starts the stream. Please keep this page open.</p>
+    </div>
+  );
 
   return (
     <div id="player" ref={ref} className="group relative mt-8 aspect-video w-full overflow-hidden rounded-2xl bg-player shadow-card ring-1 ring-border">
       {still && !url && <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
       {url && valid && available && !failed && (
-        <iframe src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} />
+        <iframe key={attempt} src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
       )}
       {overlay}
       <button onClick={fullscreen} aria-label="Fullscreen" className={`${btn.icon} absolute right-3 top-3 z-10 opacity-70 hover:opacity-100`}><Maximize className="h-4 w-4" /></button>
