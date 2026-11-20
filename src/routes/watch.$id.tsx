@@ -200,8 +200,6 @@ function Player({ id, season, episode, still, available, loading }: { id: number
   else if (!loaded) overlay = (
     <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center bg-player/90 p-6 text-center">
       <LoaderCircle className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
-      <h3 className="mt-4 text-lg font-semibold md:text-xl">Connecting to video provider…</h3>
-      <p className="mt-2 max-w-md text-sm text-muted-foreground">This can take a little longer while the provider starts the stream. Please keep this page open.</p>
     </div>
   );
 
