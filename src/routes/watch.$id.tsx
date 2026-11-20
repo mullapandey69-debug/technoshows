@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Maximize, Play, PlugZap, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize, Play, PlugZap, Clock, LoaderCircle } from "lucide-react";
 import { getSeason } from "@/lib/tmdb.functions";
 import { img, year, type Episode } from "@/lib/tmdb-types";
 import { DataNotice, Rating, btn } from "@/components/ui-kit";
@@ -195,6 +195,13 @@ function Player({ id, season, episode, still, available, loading }: { id: number
         <button className={btn.primary} onClick={retry}>Retry player</button>
         {url && <a className={btn.ghost} href={url} target="_blank" rel="noreferrer">Open provider directly</a>}
       </div>
+    </div>
+  );
+  else if (!loaded) overlay = (
+    <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center bg-player/90 p-6 text-center">
+      <LoaderCircle className="h-9 w-9 animate-spin text-primary" aria-hidden="true" />
+      <h3 className="mt-4 text-lg font-semibold md:text-xl">Connecting to video provider…</h3>
+      <p className="mt-2 max-w-md text-sm text-muted-foreground">This can take a little longer while the provider starts the stream. Please keep this page open.</p>
     </div>
   );
 
