@@ -161,7 +161,7 @@ function Player({ id, season, episode, still, available, loading }: { id: number
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [providerId, setProviderId] = useState("screenscape");
+  const [providerId, setProviderId] = useState("vidrift");
   const selectedProvider = providers.find((provider) => provider.id === providerId) ?? providers[0] ?? null;
   const url = selectedProvider?.buildEmbedUrl(id, season, episode) ?? null;
   const valid = url ? isSafeEmbedUrl(url) : false;
