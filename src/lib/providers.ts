@@ -1,6 +1,6 @@
 /**
  * Supported third-party embed providers.
- * ScreenScape remains the default; VidRift is an alternate player.
+ * VidRift is the default; ScreenScape remains available as an alternate player.
  */
 export interface EmbedProvider {
   id: string;
@@ -15,6 +15,18 @@ export interface EmbedProvider {
 }
 
 export const providers: EmbedProvider[] = [
+  {
+    id: "vidrift",
+    name: "VidRift",
+    buildEmbedUrl(tmdbId, season, episode, type = "tv") {
+      if (!Number.isInteger(tmdbId) || tmdbId <= 0) return null;
+      if (type === "tv") {
+        if (!Number.isInteger(season) || season < 0 || !Number.isInteger(episode) || episode <= 0) return null;
+        return `https://embed.vidrift.net/embed/tv/${tmdbId}/${season}/${episode}`;
+      }
+      return `https://embed.vidrift.net/embed/movie/${tmdbId}`;
+    },
+  },
   {
     id: "screenscape",
     name: "ScreenScape",
@@ -33,18 +45,6 @@ export const providers: EmbedProvider[] = [
       }
       url.search = params.toString();
       return url.href;
-    },
-  },
-  {
-    id: "vidrift",
-    name: "VidRift",
-    buildEmbedUrl(tmdbId, season, episode, type = "tv") {
-      if (!Number.isInteger(tmdbId) || tmdbId <= 0) return null;
-      if (type === "tv") {
-        if (!Number.isInteger(season) || season < 0 || !Number.isInteger(episode) || episode <= 0) return null;
-        return `https://embed.vidrift.net/embed/tv/${tmdbId}/${season}/${episode}`;
-      }
-      return `https://embed.vidrift.net/embed/movie/${tmdbId}`;
     },
   },
 ];
