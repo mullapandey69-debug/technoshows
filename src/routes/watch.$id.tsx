@@ -223,7 +223,8 @@ function Player({ id, season, episode, still, available, loading }: { id: number
       </div>
       {still && !url && <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
       {url && valid && available && !failed && (
-        <iframe key={attempt} src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
+        {/* Sandbox the cross-origin player: block popup windows and top-level redirects while retaining the permissions needed for playback. Some providers may require a less restrictive policy. */}
+        <iframe key={attempt} src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
       )}
       {overlay}
       <button onClick={fullscreen} aria-label="Fullscreen" className={`${btn.icon} absolute right-3 top-3 z-10 opacity-70 hover:opacity-100`}><Maximize className="h-4 w-4" /></button>
