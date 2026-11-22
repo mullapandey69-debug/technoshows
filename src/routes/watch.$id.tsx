@@ -223,7 +223,6 @@ function Player({ id, season, episode, still, available, loading }: { id: number
       </div>
       {still && !url && <img src={still} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />}
       {url && valid && available && !failed && (
-        {/* Sandbox the cross-origin player: block popup windows and top-level redirects while retaining the permissions needed for playback. Some providers may require a less restrictive policy. */}
         <iframe key={attempt} src={url} title={`Season ${season} Episode ${episode}`} className="absolute inset-0 h-full w-full" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowFullScreen referrerPolicy="origin" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />
       )}
       {overlay}
